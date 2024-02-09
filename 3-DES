@@ -1,0 +1,86 @@
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+import java.util.Scanner;
+
+class DESProg {
+
+    Cipher ecipher;
+    Cipher dcipher;
+    SecretKey key;
+
+    DESProg(String keyHex) throws Exception {
+        key = new SecretKeySpec(hexStringToByteArray(keyHex), "DES");
+        ecipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+        dcipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+        ecipher.init(Cipher.ENCRYPT_MODE, key);
+        dcipher.init(Cipher.DECRYPT_MODE, key);
+    }
+
+    public static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i + 1), 16));
+        }
+        return data;
+    }
+
+    public String encrypt(String str) throws Exception {
+        byte[] utf8 = str.getBytes("UTF8");
+        byte[] enc = ecipher.doFinal(utf8);
+        System.out.println("Encryption:");
+        System.out.println("After initial permutation: " + bytesToHex(enc));
+        System.out.println("Encryption Keys:");
+        printRoundKeys(ecipher);
+        return Base64.getEncoder().encodeToString(enc);
+    }
+
+    public String decrypt(String str) throws Exception {
+        byte[] dec = Base64.getDecoder().decode(str);
+        byte[] utf8 = dcipher.doFinal(dec);
+        System.out.println("Decryption:");
+        System.out.println("After initial permutation: " + new String(utf8, "UTF-8"));
+        System.out.println("Decryption Keys:");
+        printRoundKeys(dcipher);
+        return new String(utf8, "UTF-8");
+    }
+
+    private void printRoundKeys(Cipher cipher) {
+        for (int i = 1; i <= 16; i++) {
+            System.out.println("Round " + i + " Key: " + bytesToHex(cipher.update(key.getEncoded())));
+        }
+    }
+
+    public static void main(String[] argv) {
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            System.out.print("Enter the plaintext: ");
+            String secretText = scanner.nextLine();
+
+            System.out.print("Enter the key (16 characters hex): ");
+            String keyHex = scanner.nextLine();
+
+            DESProg encrypter = new DESProg(keyHex);
+            String encrypted = encrypter.encrypt(secretText);
+            System.out.println("Cipher Text: " + encrypted);
+            String decrypted = encrypter.decrypt(encrypted);
+            System.out.println("Plain Text: " + decrypted);
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+        } finally {
+            scanner.close();
+        }
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder result = new StringBuilder();
+        for (byte b : bytes) {
+            result.append(String.format("%02X", b));
+        }
+        return result.toString();
+    }
+}
