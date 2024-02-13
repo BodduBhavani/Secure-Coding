@@ -27,10 +27,13 @@ public class DESEncryptionDecryption {
             System.out.println("Encrypted string: " + encryptedBase64);
 
             // Decrypt the encrypted string
-            String decryptedText = decrypt(encryptedBytes, secretKey);
+            String decryptedText = decrypt(Base64.getDecoder().decode(encryptedBase64), secretKey);
 
             // Display the decrypted string
             System.out.println("Decrypted string: " + decryptedText);
+            
+            // Close the scanner
+            scanner.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
