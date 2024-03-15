@@ -3,6 +3,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.util.Scanner;
 
 public class SHAExample {
 
@@ -11,8 +12,10 @@ public class SHAExample {
             // Generate a secret key for the HMAC algorithm
             String secretKey = "SecretKey123"; // Replace with your secret key
 
-            // Message to be authenticated
-            String message = "Hello, this is a secret message.";
+            // Accept input message from the user
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter your message:");
+            String message = scanner.nextLine();
 
             // Generate HMAC for the message using SHA-256
             byte[] hmac = generateHmacSHA256(secretKey, message.getBytes());
