@@ -1,9 +1,10 @@
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.InvalidKeyException; // Import the InvalidKeyException class
+import java.security.InvalidKeyException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Scanner;
 
 public class MD5MACExample {
 
@@ -12,8 +13,10 @@ public class MD5MACExample {
             // Generate a secret key for the MAC algorithm
             String secretKey = "SecretKey123"; // Replace with your secret key
 
-            // Message to be authenticated
-            String message = "Hello, this is a secret message.";
+            // Accept input message from the user
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter your message:");
+            String message = scanner.nextLine();
 
             // Generate MAC for the message using MD5
             byte[] mac = generateMD5MAC(secretKey, message.getBytes());
